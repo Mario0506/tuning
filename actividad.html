@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sopa de Letras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f3f4f6; /* Fondo claro */
+            color: #333;
+        }
+        h1 {
+            margin-top: 20px;
+            color: #0056b3;
+        }
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .sopa-container {
+            display: grid;
+            grid-template-columns: repeat(20, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 1px;
+        }
+        .sopa-container div {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .sopa-container div:hover {
+            background-color: #eaf4fc;
+        }
+        .word-list {
+            text-align: left;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .word-list h2 {
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+        .word-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .word-list ul li {
+            margin: 5px 0;
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sopa de Letras</h1>
+
+    <!-- Contenedor principal -->
+    <div class="content">
+        <!-- Contenedor de la sopa de letras -->
+        <div class="sopa-container" id="sopa">
+            <!-- Aquí se generará la sopa de letras -->
+        </div>
+
+        <!-- Lista de palabras -->
+        <div class="word-list">
+            <h2>Palabras a buscar</h2>
+            <ul>
+                <li>Responsabilidad</li>
+                <li>Compromiso</li>
+                <li>Ciudadano</li>
+                <li>Social</li>
+                <li>Comunicación</li>
+                <li>Oral</li>
+                <li>Escrita</li>
+                <li>Solidaridad</li>
+                <li>Participación</li>
+                <li>Ética</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button onclick="window.location.href='index.html'">Regresar</button>
+    </div>
+
+    <script>
+        // Configuración de la sopa de letras
+        const palabras = [
+            "RESPONSABILIDAD",
+            "COMPROMISO",
+            "CIUDADANO",
+            "SOCIAL",
+            "COMUNICACION",
+            "ORAL",
+            "ESCRITA",
+            "SOLIDARIDAD",
+            "PARTICIPACION",
+            "ETICA"
+        ];
+
+        const tamaño = 20; // Tamaño de la sopa de letras
+        const sopaContainer = document.getElementById("sopa");
+        const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        // Crear matriz inicial
+        const matriz = Array.from({ length: tamaño }, () => 
+            Array.from({ length: tamaño }, () => letras.charAt(Math.floor(Math.random() * letras.length)))
+        );
+
+        // Insertar palabras en la sopa
+        const insertarPalabras = () => {
+            palabras.forEach(palabra => {
+                const longitud = palabra.length;
+                let colocado = false;
+
+                while (!colocado) {
+                    const direccion = Math.floor(Math.random() * 3); // 0: horizontal, 1: vertical, 2: diagonal
+                    const fila = Math.floor(Math.random() * tamaño);
+                    const columna = Math.floor(Math.random() * tamaño);
+
+                    if (direccion === 0 && columna + longitud <= tamaño) {
+                        // Horizontal
+                        if (matriz[fila].slice(columna, columna + longitud).every((c, i) => c === palabra[i] || letras.includes(c))) {
+                            for (let i = 0; i < longitud; i++) {
+                                matriz[fila][columna + i] = palabra[i];
+                            }
+                            colocado = true;
+                        }
+                    } else if (direccion === 1 && fila + longitud <= tamaño) {
+                        // Vertical
+                        if (Array.from({ length: longitud }, (_, i) => matriz[fila + i][columna]).every((c, i) => c === palabra[i] || letras.includes(c))) {
+                            for (let i = 0; i < longitud; i++) {
+                                matriz[fila + i][columna] = palabra[i];
+                            }
+                            colocado = true;
+                        }
+                    } else if (direccion === 2 && fila + longitud <= tamaño && columna + longitud <= tamaño) {
+                        // Diagonal
+                        if (Array.from({ length: longitud }, (_, i) => matriz[fila + i][columna + i]).every((c, i) => c === palabra[i] || letras.includes(c))) {
+                            for (let i = 0; i < longitud; i++) {
+                                matriz[fila + i][columna + i] = palabra[i];
+                            }
+                            colocado = true;
+                        }
+                    }
+                }
+            });
+        };
+
+        // Insertar las palabras y mostrar la sopa
+        insertarPalabras();
+        matriz.forEach(fila => {
+            fila.forEach(letra => {
+                const div = document.createElement("div");
+                div.textContent = letra;
+                sopaContainer.appendChild(div);
+            });
+        });
+    </script>
+</body>
+</html>
